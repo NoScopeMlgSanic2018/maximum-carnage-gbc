@@ -1,0 +1,38 @@
+name: Build Maximum Carnage GBC ROM
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check files are present
+        run: |
+          echo "=== Project structure ==="
+          find . -name "*.c" | sort
+          find . -name "*.h" | sort
+
+      - name: Download GBDK 4.x
+        run: |
+          curl -L https://github.com/gbdk-2020/gbdk-2020/releases/download/4.3.0/gbdk-linux64.tar.gz \
+            -o gbdk.tar.gz
+          tar -xzf gbdk.tar.gz
+          echo "GBDK=$(pwd)/gbdk" >> $GITHUB_ENV
+          echo "$(pwd)/gbdk/bin" >> $GITHUB_PATH
+
+      - name: Build ROM
+        run: make VERBOSE=1
+
+      - name: Upload ROM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maximum_carnage_gbc
+          path: maximum_carnage_gbc.gbc
+          retention-days: 30
