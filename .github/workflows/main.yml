@@ -13,11 +13,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check files are present
+      - name: Check structure
         run: |
-          echo "=== Project structure ==="
-          find . -name "*.c" | sort
-          find . -name "*.h" | sort
+          echo "=== Root files ==="
+          ls -la
+          echo "=== All Makefiles ==="
+          find . -name "Makefile" | sort
 
       - name: Download GBDK 4.x
         run: |
@@ -28,11 +29,14 @@ jobs:
           echo "$(pwd)/gbdk/bin" >> $GITHUB_PATH
 
       - name: Build ROM
-        run: make VERBOSE=1
+        run: |
+          find . -name "Makefile"
+          cd $(dirname $(find . -name "Makefile" | head -1))
+          make
 
       - name: Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
           name: maximum_carnage_gbc
-          path: maximum_carnage_gbc.gbc
+          path: "**/*.gbc"
           retention-days: 30
