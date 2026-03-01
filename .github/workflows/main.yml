@@ -25,18 +25,13 @@ jobs:
         run: |
           cd $(dirname $(find . -name "Makefile" | head -1))
           make
-
-      - name: Find ROM file
-        run: |
-          echo "=== Searching for ROM ==="
-          find . -name "*.gbc" | sort
-          find . -name "*.gb" | sort
+          echo "ROM_PATH=$(find . -name '*.gbc' | head -1)" >> $GITHUB_ENV
+          echo "=== Built files ==="
+          find . -name "*.gbc"
 
       - name: Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
           name: maximum_carnage_gbc
-          path: "**/*.gbc"
-          if-no-files-found: warn
+          path: ${{ env.ROM_PATH }}
           retention-days: 30
-        
