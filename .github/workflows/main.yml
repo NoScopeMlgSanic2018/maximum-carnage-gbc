@@ -13,13 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check structure
-        run: |
-          echo "=== Root files ==="
-          ls -la
-          echo "=== All Makefiles ==="
-          find . -name "Makefile" | sort
-
       - name: Download GBDK 4.x
         run: |
           curl -L https://github.com/gbdk-2020/gbdk-2020/releases/download/4.3.0/gbdk-linux64.tar.gz \
@@ -30,13 +23,20 @@ jobs:
 
       - name: Build ROM
         run: |
-          find . -name "Makefile"
           cd $(dirname $(find . -name "Makefile" | head -1))
           make
+
+      - name: Find ROM file
+        run: |
+          echo "=== Searching for ROM ==="
+          find . -name "*.gbc" | sort
+          find . -name "*.gb" | sort
 
       - name: Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
           name: maximum_carnage_gbc
           path: "**/*.gbc"
+          if-no-files-found: warn
           retention-days: 30
+        
